@@ -1,18 +1,32 @@
 <template>
-  <div
-    v-if="pageCount > 1"
-    class="text-right"
-  >
-    <div class="btn-group mx-2">
-      <button
-        v-for="i in pageNumbers"
-        :key="i"
-        class="btn"
-        v-bind:class="{ 'btn-primary' : i == currentPage }"
-        @click="setCurrentPage(i)"
+  <div class="row mt-2">
+    <div class="col form-group">
+      <select
+        name=""
+        id=""
+        class="form-control"
+        @change="changePageSize"
       >
-        {{ i }}
-      </button>
+        <option value="4">4 por Página</option>
+        <option value="8">8 por Página</option>
+        <option value="12">12 por Página</option>
+      </select>
+    </div>
+    <div
+      v-if="pageCount > 1"
+      class="text-right col"
+    >
+      <div class="btn-group mx-2">
+        <button
+          v-for="i in pageNumbers"
+          :key="i"
+          class="btn"
+          v-bind:class="{ 'btn-primary' : i == currentPage }"
+          @click="setCurrentPage(i)"
+        >
+          {{ i }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -29,7 +43,10 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(["setCurrentPage"])
+    ...mapMutations(["setCurrentPage", "setPageSize"]),
+    changePageSize($event) {
+      this.setPageSize(Number($event.target.value));
+    }
   }
 };
 </script>
