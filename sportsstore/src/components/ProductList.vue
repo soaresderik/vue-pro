@@ -30,6 +30,7 @@ export default {
   computed: {
     ...mapGetters({ products: "processedProducts" })
   },
+
   filters: {
     currency(value) {
       return new Intl.NumberFormat("pt-BR", {
