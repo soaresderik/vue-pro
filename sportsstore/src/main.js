@@ -1,5 +1,6 @@
 import Vue from "vue";
 import App from "./App.vue";
+import Vuelidate from "vuelidate";
 
 import store from "./store";
 import router from "./router";
@@ -15,6 +16,8 @@ Vue.filter("currency", value =>
     currency: "BRL"
   }).format(value)
 );
+
+Vue.use(Vuelidate);
 
 new Vue({
   store,
