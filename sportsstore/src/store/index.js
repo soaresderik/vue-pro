@@ -19,6 +19,7 @@ export default new Vuex.Store({
     categoriesData: [],
     // productsTotal: 0,
     currentPage: 1,
+    pages: [],
     pageSize: 4,
     currentCategory: "All"
   },
@@ -32,7 +33,7 @@ export default new Vuex.Store({
       return state.pages[state.currentPage];
     },
     pageCount: state => state.serverPageCount,
-    categories: state => ["Todas", ...state.categoriesData]
+    categories: state => ["All", ...state.categoriesData]
   },
   mutations: {
     _setCurrentPage(state, page) {
@@ -83,7 +84,7 @@ export default new Vuex.Store({
         state.currentPage
       }&_limit=${state.pageSize * getPageCount}`;
 
-      if (state.currentCategory != "Todas")
+      if (state.currentCategory != "All")
         url += `&category=${state.currentCategory}`;
 
       let response = await Axios.get(url);
