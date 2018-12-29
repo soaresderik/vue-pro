@@ -114,7 +114,6 @@ export default {
       this.$v.$touch();
 
       if (!this.$v.$invalid) {
-        console.log("Eiii");
         let order = await this.storeOrder(this.order);
         this.clearCart();
         this.$router.push(`/thanks/${order}`);
