@@ -4,6 +4,7 @@ import Axios from "axios";
 
 import CartModule from "./cart";
 import OrdersModule from "./orders";
+import AuthModule from "./auth";
 
 Vue.use(Vuex);
 
@@ -13,22 +14,17 @@ const categoriesUrl = `${baseUrl}/categories`;
 
 export default new Vuex.Store({
   strict: true,
-  modules: { cart: CartModule, orders: OrdersModule },
+  modules: { cart: CartModule, orders: OrdersModule, auth: AuthModule },
   state: {
-    // products: [],
     categoriesData: [],
-    // productsTotal: 0,
     currentPage: 1,
     pages: [],
     pageSize: 4,
-    currentCategory: "All"
+    currentCategory: "All",
+    searchTerm: "",
+    showSearch: false
   },
   getters: {
-    // productsFilteredByCategory: state =>
-    //   state.products.filter(
-    //     p =>
-    //       state.currentCategory == "All" || p.category == state.currentCategory
-    //   ),
     processedProducts: state => {
       return state.pages[state.currentPage];
     },
@@ -47,11 +43,7 @@ export default new Vuex.Store({
       state.currentCategory = category;
       state.currentPage = 1;
     },
-    // setData(state, data) {
-    //   state.products = data.pdata;
-    //   state.productsTotal = data.pdata.length;
-    //   state.categoriesData = data.cdata.sort();
-    // }
+
     addPage(state, page) {
       for (let i = 0; i < page.pageCount; i++) {
         Vue.set(
@@ -72,6 +64,13 @@ export default new Vuex.Store({
     },
     setPageCount(state, count) {
       state.serverPageCount = Math.ceil(Number(count) / state.pageSize);
+    },
+    setShowSearch(state, show) {
+      state.showSearch = show;
+    },
+    setSearchTerm(state, term) {
+      state.searchTerm = term;
+      state.currentPage = 1;
     }
   },
   actions: {
@@ -86,6 +85,10 @@ export default new Vuex.Store({
 
       if (state.currentCategory != "All")
         url += `&category=${state.currentCategory}`;
+
+      if (state.searchTerm != "") {
+        url += `&q=${state.searchTerm}`;
+      }
 
       let response = await Axios.get(url);
       commit("setPageCount", response.headers["x-total-count"]);
@@ -107,6 +110,16 @@ export default new Vuex.Store({
     setCurrentCategory({ commit, dispatch }, category) {
       commit("clearPages");
       commit("_setCurrentCategory", category);
+      dispatch("getPage", 2);
+    },
+    search({ commit, dispatch }, term) {
+      commit("setSearchTerm", term);
+      commit("clearPages");
+      dispatch("getPage", 2);
+    },
+    clearSearchTerm({ commit, dispatch }) {
+      commit("setSearchTerm", "");
+      commit("clearPages");
       dispatch("getPage", 2);
     }
   }
