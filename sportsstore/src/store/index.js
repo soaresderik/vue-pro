@@ -29,7 +29,10 @@ export default new Vuex.Store({
       return state.pages[state.currentPage];
     },
     pageCount: state => state.serverPageCount,
-    categories: state => ["All", ...state.categoriesData]
+    categories: state => ["All", ...state.categoriesData],
+    productById: state => id => {
+      return state.pages[state.currentPage].find(p => p.id == id);
+    }
   },
   mutations: {
     _setCurrentPage(state, page) {
@@ -71,6 +74,14 @@ export default new Vuex.Store({
     setSearchTerm(state, term) {
       state.searchTerm = term;
       state.currentPage = 1;
+    },
+    _addProduct(state, product) {
+      state.pages[state.currentPage].unshift(product);
+    },
+    _updateProduct(state, product) {
+      let page = state.pages[state.currentPage];
+      let index = page.findIndex(p => p.id == product.id);
+      Vue.set(page, index, product);
     }
   },
   actions: {
@@ -121,6 +132,24 @@ export default new Vuex.Store({
       commit("setSearchTerm", "");
       commit("clearPages");
       dispatch("getPage", 2);
+    },
+    async addProduct({ getters, commit }, product) {
+      let data = await getters.authenticatedAxios.post(productsUrl, product)
+        .data;
+      product.id = data.id;
+      commit("_addProduct", product);
+    },
+    async removeProduct({ getters, commit, dispatch }, product) {
+      await getters.authenticatedAxios.delete(`${productsUrl}/${product.id}`);
+      commit("clearPages");
+      dispatch("getPages", 1);
+    },
+    async updateProduct({ getters, commit }, product) {
+      await getters.authenticatedAxios.put(
+        `${productsUrl}/${product.id}`,
+        product
+      );
+      commit("_updateProduct", product);
     }
   }
 });
